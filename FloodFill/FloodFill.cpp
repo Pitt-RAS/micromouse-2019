@@ -3,8 +3,8 @@
 int map[][];
 //uint8_t walls; //no good way to represent a nibble
 long walls[]; // 1d array of rows; ints are too small, so long is used instead
-private static int[] cellMasks = new int[16];           // Wall arrangements
-private static long[] posMasks = new long[16];          // Masks for position of cell in long
+long[] cellMasks = new long[16];           // Wall arrangements
+long[] posMasks = new long[16];          // Masks for position of cell in long
 
 FloodFill::FloodFill()
 {
@@ -89,12 +89,14 @@ void initializeMasks() {
   cellMasks[15] = 0b1111; // NSEW - all open
 
   for(int i = 0; i < 16; i++) {
-      posMasks[i] = ~(0b1111 << (4*i));
+      long a = 0b1111;
+      posMasks[i] = ~((a) << ((15-i)*4));
   }
 }
 
 void updateWall(int row, int col, int maskID) {
-  walls[row] = walls[row] & posMasks[maskID] | cellMasks[maskID] << ((15-col)*4);
+  long shiftMask = cellMasks[maskID] << ((15-col)*4);
+  walls[row] = (walls[row] & posMasks[col]) | shiftMask;
   // AND row with posMask (0 out values at cell location)
   // OR changed row with cellMask (new value of cell)
 }
